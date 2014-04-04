@@ -1,3 +1,5 @@
+import sbt._
+
 logLevel := Level.Warn
 
 // The Typesafe repository
@@ -6,9 +8,11 @@ resolvers ++= Seq(
   "Sonatype Public Repository" at "https://oss.sonatype.org/content/groups/public"
 )
 
-lazy val root = project.in( file(".") ).dependsOn( assemblyPlugin )
+lazy val root = project
+  .in(file("."))
+  .dependsOn(sbtPlessPlugin)
 
-lazy val assemblyPlugin = uri("git://github.com/urbas/sbt-pless")
+lazy val sbtPlessPlugin = uri("git://github.com/urbas/sbt-pless")
 
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "0.8.3")
 

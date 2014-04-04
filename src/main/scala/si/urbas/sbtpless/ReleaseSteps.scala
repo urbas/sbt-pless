@@ -7,7 +7,7 @@ import sbtrelease._
 import sbt._
 import xerial.sbt.Sonatype.SonatypeKeys
 
-object PlessReleaseSteps {
+object ReleaseSteps {
 
   private lazy val readmeMdFile: sbt.File = {
     file("README.md")

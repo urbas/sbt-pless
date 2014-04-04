@@ -2,7 +2,7 @@ package si.urbas.sbtpless
 
 import sbtrelease.ReleaseStep
 
-object PlessReleaseTransformers {
+object ReleaseTransformers {
   def insertReleaseSteps(steps: ReleaseStep*): ReleaseStepInsertion = {
     ReleaseStepInsertion(steps:_*)
   }

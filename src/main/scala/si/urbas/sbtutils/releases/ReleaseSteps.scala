@@ -1,4 +1,4 @@
-package si.urbas.sbtpless
+package si.urbas.sbtutils.releases
 
 import com.typesafe.sbt.pgp.PgpKeys
 import sbtrelease.ReleasePlugin.ReleaseKeys
@@ -8,13 +8,13 @@ import xerial.sbt.Sonatype.SonatypeKeys
 
 object ReleaseSteps {
 
-  lazy val addReadmeFileToVcs: ReleaseStep = addFileToVcs(readmeMdFile)
+//  lazy val addReadmeFileToVcs: ReleaseStep = addFileToVcs(readmeMdFile)
 
   lazy val publishSigned: ReleaseStep = releaseTask(PgpKeys.publishSigned)
 
   lazy val sonatypeRelease: ReleaseStep = releaseTask(SonatypeKeys.sonatypeReleaseAll)
 
-  def addFileToVcs(file: sbt.File): BuildFunction = {
+  def addFileToVcs(file: sbt.File): ReleaseFunction = {
     state: State => {
       val vcs = Project.extract(state).get(ReleaseKeys.versionControlSystem).get
       val base = vcs.baseDir

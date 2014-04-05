@@ -1,7 +1,7 @@
-package si.urbas.sbtpless.releasesteps
+package si.urbas.sbtutils.textfiles
 
 import org.scalatest.{Matchers, WordSpec}
-import si.urbas.sbtpless.releasesteps.TextFileManipulation.replaceVersionsInText
+import TextFileManipulation.replaceVersionsInText
 
 class TextFileManipulationTest extends WordSpec with Matchers {
   val groupId = "foo"
@@ -36,8 +36,8 @@ class TextFileManipulationTest extends WordSpec with Matchers {
 
   def sbtCoordinates(groupId: String, artifactId: String, version: String): String = {
     s"""
-            |"$groupId" %% "$artifactId" % "$version"
-          """.stripMargin
+        |"$groupId" %% "$artifactId" % "$version"
+     """.stripMargin
   }
 
 }

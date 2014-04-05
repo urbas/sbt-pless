@@ -1,4 +1,4 @@
-package si.urbas.sbtpless
+package si.urbas.sbtutils.releases
 
 import sbtrelease.ReleaseStep
 

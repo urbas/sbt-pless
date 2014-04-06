@@ -8,7 +8,7 @@
 
         resolvers += "Sonatype Public Repository" at "https://oss.sonatype.org/content/groups/public"
 
-        addSbtPlugin("si.urbas" % "sbt-pless" % "0.0.1-SNAPSHOT")
+        addSbtPlugin("si.urbas" % "sbt-pless" % "0.0.1")
 
 2.  Add this line at the top of `build.sbt`:
 

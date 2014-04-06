@@ -41,6 +41,6 @@ object TextFileManipulation {
 
   private val someSpace = "\\s+"
   private val versionDelimiter = s"$someSpace%$someSpace"
-  private val sbtDelimiter = s"$someSpace%%$someSpace"
+  private val sbtDelimiter = s"$someSpace%%?$someSpace"
   private val versionCoordinatePattern = "\"[^\"]+\""
 }

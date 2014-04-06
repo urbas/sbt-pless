@@ -1,20 +1,34 @@
 package si.urbas.sbtutils.releases
 
-import sbtrelease.ReleaseStep
+import sbtrelease.{releaseTask, ReleaseStep}
+import sbt.TaskKey
+import si.urbas.sbtutils.releases.ReleaseTransformers.tasks2buildSteps
 
 object ReleaseTransformers {
   def insertReleaseSteps(steps: ReleaseStep*): ReleaseStepInsertion = {
-    ReleaseStepInsertion(steps:_*)
+    ReleaseStepInsertion(steps: _*)
+  }
+
+  def insertTasks(tasks: TaskKey[_]*): ReleaseStepInsertion = {
+    ReleaseStepInsertion(tasks2buildSteps(tasks): _*)
   }
 
   def replaceReleaseStep(stepToReplace: ReleaseStep): ReleaseStepReplacement = {
     ReleaseStepReplacement(stepToReplace)
   }
+
+  def tasks2buildSteps(tasks: Seq[TaskKey[_]]): Seq[ReleaseStep] = {
+    tasks.map(releaseTask(_)).map(ReleaseStep(_))
+  }
 }
 
 case class ReleaseStepReplacement(stepToReplace: ReleaseStep) {
   def withReleaseSteps(steps: ReleaseStep*): ReleaseStepReplacementWithNewStep = {
-    ReleaseStepReplacementWithNewStep(stepToReplace, steps:_*)
+    ReleaseStepReplacementWithNewStep(stepToReplace, steps: _*)
+  }
+
+  def withTasks(tasks: TaskKey[_]*): ReleaseStepReplacementWithNewStep = {
+    ReleaseStepReplacementWithNewStep(stepToReplace, tasks2buildSteps(tasks): _*)
   }
 }
 

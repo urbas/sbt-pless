@@ -1,5 +1,6 @@
 import com.typesafe.sbt.pgp.PgpKeys.publishSigned
 import de.johoop.jacoco4sbt.JacocoPlugin._
+import sbtrelease.ReleasePlugin._
 import sbtrelease.ReleasePlugin.ReleaseKeys.releaseProcess
 import sbtrelease.ReleaseStateTransformations._
 import si.urbas.sbtutils.releases.ReleaseProcessTransformation._
@@ -67,6 +68,8 @@ publishArtifact in(Test, packageBin) := true
 publishArtifact in(Test, packageSrc) := true
 
 jacoco.settings
+
+releaseSettings
 
 si.urbas.sbtutils.textfiles.tasks
 

@@ -1,3 +1,4 @@
+import de.johoop.jacoco4sbt.JacocoPlugin._
 import sbt._
 
 sbtPlugin := true
@@ -16,3 +17,5 @@ addSbtPlugin("com.github.gseitz" % "sbt-release" % "0.8.3")
 addSbtPlugin("com.typesafe.sbt" %% "sbt-pgp" % "0.8.3")
 
 addSbtPlugin("org.xerial.sbt" %% "sbt-sonatype" % "0.2.1")
+
+jacoco.settings

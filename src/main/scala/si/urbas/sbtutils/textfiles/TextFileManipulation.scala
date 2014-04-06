@@ -13,7 +13,7 @@ object TextFileManipulation {
     replaceTextInFile(file, replaceVersionsInText(_, groupId, artifactId, version))
   }
 
-  private def replaceVersionsInText(content: String,
+  private[textfiles] def replaceVersionsInText(content: String,
                                     groupId: String,
                                     artifactId: String,
                                     newVersion: String): String = {

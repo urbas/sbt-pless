@@ -4,7 +4,9 @@
 
 ## Usage
 
-1.  Add the following line to the `project/plugins.sbt` file:
+1.  Add the following lines to the `project/plugins.sbt` file:
+
+        resolvers += "Sonatype Public Repository" at "https://oss.sonatype.org/content/groups/public"
 
         addSbtPlugin("si.urbas" % "sbt-pless" % "0.0.1-SNAPSHOT")
 

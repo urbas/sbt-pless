@@ -60,7 +60,6 @@ class ReleaseProcessTransformationTest extends WordSpec with Matchers {
         existingReleaseStepSecond,
         existingReleaseStepLast
       )
-
     }
   }
 
@@ -89,8 +88,19 @@ class ReleaseProcessTransformationTest extends WordSpec with Matchers {
         existingReleaseStepLast
       )
     }
-  }
 
+    "happen after preceding transformations" in new TestSetup {
+      val newReleaseProcess = replaceReleaseStep(existingReleaseStepSecond).withSteps(newReleaseStep)
+        .removeReleaseSteps(existingReleaseStepSecond)
+        .in(existingReleaseProcess)
+
+      newReleaseProcess should contain theSameElementsInOrderAs List(
+        existingReleaseStepFirst,
+        newReleaseStep,
+        existingReleaseStepLast
+      )
+    }
+  }
 
   class TestSetup {
     val newReleaseStep = ReleaseStep(state => state)

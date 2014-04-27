@@ -10,11 +10,11 @@ trait ReleaseProcessTransformation {
   }
 
   def insertReleaseTasks(tasks: TaskKey[_]*): ReleaseStepInsertions = {
-    ReleaseStepInsertions(globalTasksToReleaseSteps(tasks), previousTransformations)
+    ReleaseStepInsertions(tasksToReleaseSteps(tasks), previousTransformations)
   }
 
   def removeReleaseSteps(steps: ReleaseStep*): ReleaseProcessTransformAggregate = {
-    ReleaseProcessTransformAggregate(ReleaseStepRemover(steps.toSet) +: previousTransformations)
+    ReleaseProcessTransformAggregate(previousTransformations :+ ReleaseStepRemover(steps.toSet))
   }
 
   def replaceReleaseStep(stepToReplace: ReleaseStep): ReleaseStepReplacements = {

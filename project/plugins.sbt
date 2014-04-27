@@ -12,4 +12,4 @@ addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "0.2.1")
 
 addSbtPlugin("de.johoop" % "jacoco4sbt" % "2.1.4")
 
-addSbtPlugin("si.urbas" % "sbt-pless" % "0.0.1")
+addSbtPlugin("si.urbas" % "sbt-pless" % "0.0.2-SNAPSHOT")

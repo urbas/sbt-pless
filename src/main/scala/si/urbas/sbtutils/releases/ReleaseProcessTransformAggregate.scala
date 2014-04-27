@@ -2,7 +2,6 @@ package si.urbas.sbtutils.releases
 
 import sbtrelease.ReleaseStep
 import sbt.TaskKey
-import si.urbas.sbtutils.releases.ReleaseProcessTransformation.globalTasksToReleaseSteps
 
 case class ReleaseProcessTransformAggregate(transformations: Seq[ReleaseProcessTransformer]) extends ReleaseProcessTransformation {
   def in(releaseProcess: Seq[ReleaseStep]): Seq[ReleaseStep] = {
@@ -17,7 +16,7 @@ case class ReleaseProcessTransformAggregate(transformations: Seq[ReleaseProcessT
     ReleaseStepInsertions(steps, transformations)
   }
 
-  override def insertGlobalTasks(tasks: TaskKey[_]*): ReleaseStepInsertions = {
+  override def insertReleaseTasks(tasks: TaskKey[_]*): ReleaseStepInsertions = {
     ReleaseStepInsertions(globalTasksToReleaseSteps(tasks), transformations)
   }
 

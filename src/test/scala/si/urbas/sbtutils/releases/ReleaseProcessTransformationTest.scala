@@ -8,7 +8,7 @@ class ReleaseProcessTransformationTest extends WordSpec with Matchers {
   "inserting a release step at the front of the release process" must {
     "throw an exception" in new TestSetup {
       intercept[IllegalArgumentException] {
-        insertGlobalTasks(newTaskKey).before(existingReleaseStepFirst).in(existingReleaseProcess)
+        insertReleaseTasks(newTaskKey).before(existingReleaseStepFirst).in(existingReleaseProcess)
       }
     }
   }
@@ -28,7 +28,7 @@ class ReleaseProcessTransformationTest extends WordSpec with Matchers {
   "inserting a release step at the back of the release process" must {
     "throw an exception" in new TestSetup {
       intercept[IllegalArgumentException] {
-        insertGlobalTasks(newTaskKey).after(existingReleaseStepLast).in(existingReleaseProcess)
+        insertReleaseTasks(newTaskKey).after(existingReleaseStepLast).in(existingReleaseProcess)
       }
     }
   }
@@ -84,13 +84,13 @@ class ReleaseProcessTransformationTest extends WordSpec with Matchers {
       val newReleaseProcess = insertReleaseSteps(newReleaseStep).after(existingReleaseStepSecond)
       .replaceReleaseStep(newReleaseStep).withReleaseSteps(existingReleaseStepFirst)
         .in(existingReleaseProcess)
+
       newReleaseProcess should contain theSameElementsInOrderAs List(
         existingReleaseStepFirst,
         existingReleaseStepSecond,
         existingReleaseStepFirst,
         existingReleaseStepLast
       )
-
     }
   }
 

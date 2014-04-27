@@ -24,4 +24,8 @@ package object releases {
         extractedProject.runAggregated(task in projectRef, state)
     })
   }
+
+  def globalTasksToReleaseSteps(tasks: Seq[TaskKey[_]]): Seq[ReleaseStep] = {
+    tasks.map(globalTaskToReleaseStep)
+  }
 }

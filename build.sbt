@@ -80,6 +80,6 @@ bumpVersionInPluginsSbtFile := {
   bumpVersionInFile(file("project/plugins.sbt"), organization.value, name.value, version.value)
 }
 
-releaseProcess := insertReleaseTasks(bumpVersionInReadmeMd, bumpVersionInPluginsSbtFile, addReadmeFileToVcs).after(setReleaseVersion)
-  .replaceReleaseStep(publishArtifacts).withTasks(publishSigned, sonatypeReleaseAll)
+releaseProcess := insertTasks(bumpVersionInReadmeMd, bumpVersionInPluginsSbtFile, addReadmeFileToVcs).after(setReleaseVersion)
+  .replaceStep(publishArtifacts).withAggregatedTasks(publishSigned, sonatypeReleaseAll)
   .in(releaseProcess.value)

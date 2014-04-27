@@ -4,23 +4,26 @@ import sbtrelease.ReleaseStep
 import sbt.TaskKey
 
 trait ReleaseProcessTransformation {
-  def insertReleaseSteps(steps: ReleaseStep*): ReleaseStepInsertions
 
-  def insertReleaseTasks(tasks: TaskKey[_]*): ReleaseStepInsertions
+  def insertReleaseSteps(steps: ReleaseStep*): ReleaseStepInsertions = {
+    ReleaseStepInsertions(steps, previousTransformations)
+  }
 
-  def replaceReleaseStep(stepToReplace: ReleaseStep): ReleaseStepReplacements
+  def insertReleaseTasks(tasks: TaskKey[_]*): ReleaseStepInsertions = {
+    ReleaseStepInsertions(globalTasksToReleaseSteps(tasks), previousTransformations)
+  }
+
+  def removeReleaseSteps(steps: ReleaseStep*): ReleaseProcessTransformAggregate = {
+    ReleaseProcessTransformAggregate(ReleaseStepRemover(steps.toSet) +: previousTransformations)
+  }
+
+  def replaceReleaseStep(stepToReplace: ReleaseStep): ReleaseStepReplacements = {
+    ReleaseStepReplacements(stepToReplace, previousTransformations)
+  }
+
+  protected def previousTransformations: Seq[ReleaseProcessTransformer] = {
+    Nil
+  }
 }
 
-object ReleaseProcessTransformation extends ReleaseProcessTransformation {
-  override def insertReleaseSteps(steps: ReleaseStep*): ReleaseStepInsertions = {
-    ReleaseStepInsertions(steps, Nil)
-  }
-
-  override def insertReleaseTasks(tasks: TaskKey[_]*): ReleaseStepInsertions = {
-    insertReleaseSteps(globalTasksToReleaseSteps(tasks): _*)
-  }
-
-  override def replaceReleaseStep(stepToReplace: ReleaseStep): ReleaseStepReplacements = {
-    ReleaseStepReplacements(stepToReplace, Nil)
-  }
-}
+object ReleaseProcessTransformation extends ReleaseProcessTransformation

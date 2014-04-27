@@ -5,13 +5,6 @@ import ReleaseProcessTransformation._
 import sbtrelease.ReleaseStep
 
 class ReleaseProcessTransformationTest extends WordSpec with Matchers {
-  "inserting a release step at the front of the release process" must {
-    "throw an exception" in new TestSetup {
-      intercept[IllegalArgumentException] {
-        insertReleaseTasks(newTaskKey).before(existingReleaseStepFirst).in(existingReleaseProcess)
-      }
-    }
-  }
 
   "inserting a release step before the second release step" must {
     "produce a corresponding release process" in new TestSetup {
@@ -22,14 +15,6 @@ class ReleaseProcessTransformationTest extends WordSpec with Matchers {
         existingReleaseStepSecond,
         existingReleaseStepLast
       )
-    }
-  }
-
-  "inserting a release step at the back of the release process" must {
-    "throw an exception" in new TestSetup {
-      intercept[IllegalArgumentException] {
-        insertReleaseTasks(newTaskKey).after(existingReleaseStepLast).in(existingReleaseProcess)
-      }
     }
   }
 
@@ -48,14 +33,14 @@ class ReleaseProcessTransformationTest extends WordSpec with Matchers {
   "replacing a non-existent release step" must {
     "throw an exception" in new TestSetup {
       intercept[IllegalArgumentException] {
-        replaceReleaseStep(newReleaseStep).withReleaseSteps(null).in(existingReleaseProcess)
+        replaceReleaseStep(newReleaseStep).withSteps(null).in(existingReleaseProcess)
       }
     }
   }
 
   "replacing the second release step" must {
     "produce a corresponding release process" in new TestSetup {
-      val newReleaseProcess = replaceReleaseStep(existingReleaseStepSecond).withReleaseSteps(newReleaseStep).in(existingReleaseProcess)
+      val newReleaseProcess = replaceReleaseStep(existingReleaseStepSecond).withSteps(newReleaseStep).in(existingReleaseProcess)
       newReleaseProcess should contain theSameElementsInOrderAs List(
         existingReleaseStepFirst,
         newReleaseStep,
@@ -66,7 +51,7 @@ class ReleaseProcessTransformationTest extends WordSpec with Matchers {
 
   "chaining insertion after replacement" must {
     "produce a corresponding release process" in new TestSetup {
-      val newReleaseProcess = replaceReleaseStep(existingReleaseStepSecond).withReleaseSteps(newReleaseStep)
+      val newReleaseProcess = replaceReleaseStep(existingReleaseStepSecond).withSteps(newReleaseStep)
         .insertReleaseSteps(existingReleaseStepSecond).after(newReleaseStep)
         .in(existingReleaseProcess)
       newReleaseProcess should contain theSameElementsInOrderAs List(
@@ -82,12 +67,24 @@ class ReleaseProcessTransformationTest extends WordSpec with Matchers {
   "chaining replacement after insertion" must {
     "produce a corresponding release process" in new TestSetup {
       val newReleaseProcess = insertReleaseSteps(newReleaseStep).after(existingReleaseStepSecond)
-      .replaceReleaseStep(newReleaseStep).withReleaseSteps(existingReleaseStepFirst)
+      .replaceReleaseStep(newReleaseStep).withSteps(existingReleaseStepFirst)
         .in(existingReleaseProcess)
 
       newReleaseProcess should contain theSameElementsInOrderAs List(
         existingReleaseStepFirst,
         existingReleaseStepSecond,
+        existingReleaseStepFirst,
+        existingReleaseStepLast
+      )
+    }
+  }
+
+  "removing release steps" must {
+    "produce a release process without removed steps" in new TestSetup {
+      val newReleaseProcess = removeReleaseSteps(existingReleaseStepSecond)
+        .in(existingReleaseProcess)
+
+      newReleaseProcess should contain theSameElementsInOrderAs List(
         existingReleaseStepFirst,
         existingReleaseStepLast
       )

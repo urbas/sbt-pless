@@ -19,5 +19,5 @@
         si.urbas.sbtutils.textfiles.tasks
 
         insertReleaseTasks(bumpVersionInReadmeMd, addReadmeFileToVcs).after(setReleaseVersion)
-          .replaceReleaseStep(publishArtifacts).withGlobalTasks(publishSigned, sonatypeReleaseAll)
+          .replaceReleaseStep(publishArtifacts).withTasks(publishSigned, sonatypeReleaseAll)
           .in(releaseProcess.value)

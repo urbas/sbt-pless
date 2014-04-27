@@ -28,4 +28,8 @@ package object releases {
   def tasksToReleaseSteps(tasks: Seq[TaskKey[_]]): Seq[ReleaseStep] = {
     tasks.map(taskToReleaseStep)
   }
+
+  def aggregatedTasksToReleaseSteps(tasks: Seq[TaskKey[_]]): Seq[ReleaseStep] = {
+    tasks.map(aggregatedTaskToReleaseStep)
+  }
 }

@@ -5,6 +5,7 @@ import sbtrelease.ReleasePlugin.ReleaseKeys.releaseProcess
 import sbtrelease.ReleaseStateTransformations._
 import si.urbas.sbtutils.releases.ReleaseProcessTransformation._
 import si.urbas.sbtutils.textfiles._
+import si.urbas.sbtutils.textfiles.TextFileManipulation._
 import xerial.sbt.Sonatype
 import xerial.sbt.Sonatype.SonatypeKeys
 import sbt._
@@ -73,6 +74,12 @@ releaseSettings
 
 si.urbas.sbtutils.textfiles.tasks
 
-releaseProcess := insertReleaseTasks(bumpVersionInReadmeMd, addReadmeFileToVcs).after(setReleaseVersion)
+lazy val bumpVersionInPluginsSbtFile = taskKey[Unit]("Replaces any references to the version of this project in 'project/plugins.sbt'.")
+
+bumpVersionInPluginsSbtFile := {
+  bumpVersionInFile(file("project/plugins.sbt"), organization.value, name.value, version.value)
+}
+
+releaseProcess := insertReleaseTasks(bumpVersionInReadmeMd, bumpVersionInPluginsSbtFile, addReadmeFileToVcs).after(setReleaseVersion)
   .replaceReleaseStep(publishArtifacts).withTasks(publishSigned, sonatypeReleaseAll)
   .in(releaseProcess.value)

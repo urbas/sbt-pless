@@ -11,7 +11,11 @@ case class ReleaseStepReplacements(stepToReplace: ReleaseStep,
   }
 
   def withTasks(tasks: TaskKey[_]*): ReleaseProcessTransformAggregate = {
-    ReleaseProcessTransformAggregate(previousTransforms :+ ReleaseStepReplacement(stepToReplace, tasksToReleaseSteps(tasks)))
+    withSteps(tasksToReleaseSteps(tasks):_*)
+  }
+
+  def withAggregatedTasks(tasks: TaskKey[_]*): ReleaseProcessTransformAggregate = {
+    withSteps(aggregatedTasksToReleaseSteps(tasks):_*)
   }
 
 }

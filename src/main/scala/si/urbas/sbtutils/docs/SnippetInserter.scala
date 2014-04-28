@@ -2,33 +2,70 @@ package si.urbas.sbtutils.docs
 
 import sbt._
 import java.util.regex.Pattern
+import si.urbas.sbtutils.docs.SnippetInserter._
+import java.io.FileNotFoundException
 
-class SnippetInserter(projectBaseDir: File, currentTemplate: File) {
+class SnippetInserter(projectBaseDir: File, templateFile: File) {
+
   def snippet(sourceFile: String, snippetName: String, linePrefix: String = ""): String = {
-    val fileOpt = List(projectBaseDir.getCanonicalFile, currentTemplate.getParentFile.getCanonicalFile)
+    val snippetFile = findSnippetFile(sourceFile)
+    if (snippetFile.isFile) {
+      val snippetLines = linesWithinSnippet(IO.readLines(snippetFile), snippetName)
+      concatenateSnippetLines(snippetLines, linePrefix)
+    } else {
+      throw new FileNotFoundException(insertionErrorMessage(snippetName, sourceFile) + s" Could not find the file.")
+    }
+  }
+
+
+  private def concatenateSnippetLines(snippetLines: Iterable[String], linePrefix: String): String = {
+    val strBuilder = new StringBuilder()
+    for (line <- snippetLines) {
+      if (!strBuilder.isEmpty) {
+        strBuilder.append(LINE_SEPARATOR)
+      }
+      strBuilder.append(linePrefix).append(line)
+    }
+    strBuilder.toString()
+  }
+
+  private def insertionErrorMessage(snippetName: String, sourceFile: String): String = {
+    s"Could not insert the snippet '$snippetName' in file '$sourceFile'."
+  }
+
+  private def findSnippetFile(sourceFile: String): File = {
+    List(projectBaseDir.getCanonicalFile, templateFile.getParentFile.getCanonicalFile)
       .map(_.relativize(file(sourceFile))).collectFirst {
       case Some(file) => file
-    }
-    val tehFile = fileOpt.getOrElse(file(sourceFile))
-    if (tehFile.isFile) {
-      val strBuilder = new StringBuilder()
-      var insideSnippet = false
-      for (line <- IO.readLines(tehFile)) {
+    }.getOrElse(file(sourceFile))
+  }
+
+}
+
+object SnippetInserter {
+  private val LINE_SEPARATOR = "\n"
+
+  def linesWithinSnippet(lines: Iterable[String], snippetName: String): Iterable[String] = {
+    val snippetStartPattern = createSnippetStartPattern(snippetName)
+    val snippetEndPattern = createSnippetEndPattern(snippetName)
+    var insideSnippet = false
+    lines.filter {
+      line =>
         if (!insideSnippet) {
-          insideSnippet = line.matches("^.*?SNIPPET:\\s*?" + Pattern.quote(snippetName) + "$")
+          insideSnippet = snippetStartPattern.matcher(line).matches()
+          false
         } else {
-          insideSnippet = !line.matches("^.*?ENDSNIPPET:\\s*?" + Pattern.quote(snippetName) + "$")
-          if (insideSnippet) {
-            if (!strBuilder.isEmpty) {
-              strBuilder.append(System.lineSeparator())
-            }
-            strBuilder.append(linePrefix).append(line)
-          }
+          insideSnippet = !snippetEndPattern.matcher(line).matches()
+          insideSnippet
         }
-      }
-      strBuilder.toString()
-    } else {
-      throw new RuntimeException(s"Sad times... cannot find $sourceFile")
     }
+  }
+
+  private def createSnippetStartPattern(snippetName: String): Pattern = {
+    Pattern.compile("^.*?SNIPPET:\\s*?" + Pattern.quote(snippetName) + "$")
+  }
+
+  private def createSnippetEndPattern(snippetName: String): Pattern = {
+    Pattern.compile("^.*?ENDSNIPPET:\\s*?" + Pattern.quote(snippetName) + "$")
   }
 }

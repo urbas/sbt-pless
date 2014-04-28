@@ -12,7 +12,7 @@ package object docs {
   lazy val docsOutputDir = settingKey[File]("the directory into which output docs will be placed.")
   lazy val docsDirs = settingKey[Seq[File]]("a list of SSP directories under which SSP files should be looked up.")
   lazy val docs = taskKey[Seq[File]]("a list of SSP files that should be processed.")
-  lazy val generateSspDocs = taskKey[Unit]("processes Scalate SSP template files")
+  lazy val generateSspDocs = taskKey[Seq[File]]("processes Scalate SSP template files")
 
   lazy val tasks = Seq[Def.Setting[_]](
     sspDocsDir := sourceDirectory.value / "main" / DOCS_SOURCES_DIR,

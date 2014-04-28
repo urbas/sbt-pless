@@ -24,7 +24,7 @@ Now you can transform your release process like this (this example uses the `sbt
 
 ```scala
 releaseProcess := ReleaseProcessTransformation
-  .insertTasks(bumpVersionInReadmeMd, bumpVersionInPluginsSbtFile, addReadmeFileToVcs).after(setReleaseVersion)
+  .insertTasks(bumpVersionInReadmeMd, generateAndStageDocs, bumpVersionInPluginsSbtFile, addReadmeFileToVcs).after(setReleaseVersion)
   .replaceStep(publishArtifacts).withAggregatedTasks(publishSigned, sonatypeReleaseAll)
   .in(releaseProcess.value)
 ```

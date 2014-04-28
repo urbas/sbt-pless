@@ -11,18 +11,20 @@ private[docs] object DocsGenerator {
                    outputDirectory: File,
                    docsDirectories: Seq[File],
                    scratchDirectory: File,
-                   docFiles: Seq[File]) {
+                   docFiles: Seq[File]): Seq[File] = {
     log.info(s"Processing documentation...")
     outputDirectory.mkdirs()
     val canonicalBaseDirs = docsDirectories.map(_.getCanonicalFile).toList
     val templateEngine = createTemplateEngine(canonicalBaseDirs, scratchDirectory)
 
-    for (docFile <- docFiles) {
-      val relativeDocFile = findRelativePath(canonicalBaseDirs, docFile)
-      val outputFile = toResolvedPathWithoutExtension(outputDirectory, relativeDocFile)
-      log.info(s"Generating doc: $relativeDocFile -> ${outputDirectory.relativize(file(outputFile)).get}")
-      val generatedDocContent = templateEngine.layout(relativeDocFile, createTemplateBindings(docFile))
-      IO.write(file(outputFile), generatedDocContent)
+    docFiles.map {
+      docFile =>
+        val relativeDocFile = findRelativePath(canonicalBaseDirs, docFile)
+        val outputFile = file(toResolvedPathWithoutExtension(outputDirectory, relativeDocFile))
+        log.info(s"Generating doc: $relativeDocFile -> ${outputDirectory.relativize(outputFile).get}")
+        val generatedDocContent = templateEngine.layout(relativeDocFile, createTemplateBindings(docFile))
+        IO.write(outputFile, generatedDocContent)
+        outputFile
     }
   }
 

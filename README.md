@@ -4,29 +4,45 @@
 
 ## Usage
 
-1.  Add the following lines to the `project/plugins.sbt` file:
+Add the following lines to the `project/plugins.sbt` file:
 
-        resolvers += "Sonatype Public Repository" at "https://oss.sonatype.org/content/groups/public"
+```scala
+resolvers += "Sonatype Public Repository" at "https://oss.sonatype.org/content/groups/public"
 
-        addSbtPlugin("si.urbas" % "sbt-pless" % "0.0.5")
+addSbtPlugin("si.urbas" % "sbt-pless" % "0.0.5")
+```
 
-2.  Add this line at the top of `build.sbt`:
+### Release process transformations
 
-    ```scala
-    import si.urbas.sbtutils.releases.ReleaseProcessTransformation
-    ```
+Add this line at the top of `build.sbt`:
 
-3.  Now you can transform your release process like this (this example uses the `sbtrelease` and the `pgpkeys` plugins):
+```scala
+import si.urbas.sbtutils.releases.ReleaseProcessTransformation
+```
 
-    ```scala
-    si.urbas.sbtutils.textfiles.tasks
-    
-    lazy val bumpVersionInPluginsSbtFile = taskKey[Unit]("Replaces any references to the version of this project in 'project/plugins.sbt'.")
-    
-    bumpVersionInPluginsSbtFile := bumpVersionInFile(file("project/plugins.sbt"), organization.value, name.value, version.value)
-    
-    releaseProcess := ReleaseProcessTransformation
-      .insertTasks(bumpVersionInReadmeMd, bumpVersionInPluginsSbtFile, addReadmeFileToVcs).after(setReleaseVersion)
-      .replaceStep(publishArtifacts).withAggregatedTasks(publishSigned, sonatypeReleaseAll)
-      .in(releaseProcess.value)
-    ```
+Now you can transform your release process like this (this example uses the `sbtrelease` and the `pgpkeys` plugins):
+
+```scala
+releaseProcess := ReleaseProcessTransformation
+  .insertTasks(bumpVersionInReadmeMd, bumpVersionInPluginsSbtFile, addReadmeFileToVcs).after(setReleaseVersion)
+  .replaceStep(publishArtifacts).withAggregatedTasks(publishSigned, sonatypeReleaseAll)
+  .in(releaseProcess.value)
+```
+
+### Documentation generation
+
+Add the following to your `build.sbt` file:
+
+```scala
+si.urbas.sbtutils.docs.tasks
+
+docs.docsOutputDir := file(".")
+```
+
+Now create the file `src/main/docs/README.md.ssp` and run the following SBT task:
+
+    generateSspDocs
+
+This will generate the `README.md` file in the project's base directory.
+
+See [Scalate's SSP documentation](http://scalate.fusesource.org/documentation/ssp-reference.html) for more information on how to write SSP docs.

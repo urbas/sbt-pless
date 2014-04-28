@@ -4,7 +4,7 @@ import sbt._
 import java.util.regex.Pattern
 
 class SnippetInserter(projectBaseDir: File, currentTemplate: File) {
-  def snippet(sourceFile: String, snippetName: String, linePrefix: String): String = {
+  def snippet(sourceFile: String, snippetName: String, linePrefix: String = ""): String = {
     val fileOpt = List(projectBaseDir.getCanonicalFile, currentTemplate.getParentFile.getCanonicalFile)
       .map(_.relativize(file(sourceFile))).collectFirst {
       case Some(file) => file

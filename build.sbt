@@ -77,17 +77,19 @@ jacoco.settings
 
 releaseSettings
 
+// SNIPPET: generatingDocs
 si.urbas.sbtutils.docs.tasks
 
 docs.docsOutputDir := file(".")
+// ENDSNIPPET: generatingDocs
 
-// SNIPPET: releaseProcess
 si.urbas.sbtutils.textfiles.tasks
 
 lazy val bumpVersionInPluginsSbtFile = taskKey[Unit]("Replaces any references to the version of this project in 'project/plugins.sbt'.")
 
 bumpVersionInPluginsSbtFile := bumpVersionInFile(file("project/plugins.sbt"), organization.value, name.value, version.value)
 
+// SNIPPET: releaseProcess
 releaseProcess := ReleaseProcessTransformation
   .insertTasks(bumpVersionInReadmeMd, bumpVersionInPluginsSbtFile, addReadmeFileToVcs).after(setReleaseVersion)
   .replaceStep(publishArtifacts).withAggregatedTasks(publishSigned, sonatypeReleaseAll)

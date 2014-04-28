@@ -12,12 +12,21 @@
 
 2.  Add this line at the top of `build.sbt`:
 
-        import si.urbas.sbtutils.releases.ReleaseProcessTransformation._
+    ```scala
+    import si.urbas.sbtutils.releases.ReleaseProcessTransformation
+    ```
 
 3.  Now you can transform your release process like this (this example uses the `sbtrelease` and the `pgpkeys` plugins):
 
-        si.urbas.sbtutils.textfiles.tasks
-
-        insertReleaseTasks(bumpVersionInReadmeMd, addReadmeFileToVcs).after(setReleaseVersion)
-          .replaceReleaseStep(publishArtifacts).withTasks(publishSigned, sonatypeReleaseAll)
-          .in(releaseProcess.value)
+    ```scala
+    si.urbas.sbtutils.textfiles.tasks
+    
+    lazy val bumpVersionInPluginsSbtFile = taskKey[Unit]("Replaces any references to the version of this project in 'project/plugins.sbt'.")
+    
+    bumpVersionInPluginsSbtFile := bumpVersionInFile(file("project/plugins.sbt"), organization.value, name.value, version.value)
+    
+    releaseProcess := ReleaseProcessTransformation
+      .insertTasks(bumpVersionInReadmeMd, bumpVersionInPluginsSbtFile, addReadmeFileToVcs).after(setReleaseVersion)
+      .replaceStep(publishArtifacts).withAggregatedTasks(publishSigned, sonatypeReleaseAll)
+      .in(releaseProcess.value)
+    ```

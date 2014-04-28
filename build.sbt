@@ -3,7 +3,10 @@ import de.johoop.jacoco4sbt.JacocoPlugin._
 import sbtrelease.ReleasePlugin._
 import sbtrelease.ReleasePlugin.ReleaseKeys.releaseProcess
 import sbtrelease.ReleaseStateTransformations._
-import si.urbas.sbtutils.releases.ReleaseProcessTransformation._
+import si.urbas.sbtutils.docs
+// SNIPPET: importProcessTransformation
+import si.urbas.sbtutils.releases.ReleaseProcessTransformation
+// ENDSNIPPET: importProcessTransformation
 import si.urbas.sbtutils.textfiles._
 import si.urbas.sbtutils.textfiles.TextFileManipulation._
 import xerial.sbt.Sonatype
@@ -26,8 +29,10 @@ publishMavenStyle := true
 SonatypeKeys.profileName := "org.xerial"
 
 libraryDependencies ++= Seq(
+  "org.fusesource.scalate" %% "scalate-core" % "1.6.1",
   "org.scalatest" %% "scalatest" % "2.0" % "test",
-  "org.mockito" % "mockito-all" % "1.9.5" % "test"
+  "org.mockito" % "mockito-all" % "1.9.5" % "test",
+  "org.slf4j" % "slf4j-simple" % "1.7.7"
 )
 
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "0.8.3")
@@ -72,14 +77,19 @@ jacoco.settings
 
 releaseSettings
 
+si.urbas.sbtutils.docs.tasks
+
+docs.docsOutputDir := file(".")
+
+// SNIPPET: releaseProcess
 si.urbas.sbtutils.textfiles.tasks
 
 lazy val bumpVersionInPluginsSbtFile = taskKey[Unit]("Replaces any references to the version of this project in 'project/plugins.sbt'.")
 
-bumpVersionInPluginsSbtFile := {
-  bumpVersionInFile(file("project/plugins.sbt"), organization.value, name.value, version.value)
-}
+bumpVersionInPluginsSbtFile := bumpVersionInFile(file("project/plugins.sbt"), organization.value, name.value, version.value)
 
-releaseProcess := insertTasks(bumpVersionInReadmeMd, bumpVersionInPluginsSbtFile, addReadmeFileToVcs).after(setReleaseVersion)
+releaseProcess := ReleaseProcessTransformation
+  .insertTasks(bumpVersionInReadmeMd, bumpVersionInPluginsSbtFile, addReadmeFileToVcs).after(setReleaseVersion)
   .replaceStep(publishArtifacts).withAggregatedTasks(publishSigned, sonatypeReleaseAll)
   .in(releaseProcess.value)
+// ENDSNIPPET: releaseProcess

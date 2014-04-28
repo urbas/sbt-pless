@@ -1,0 +1,23 @@
+# sbt-pless
+
+[![Build Status](https://travis-ci.org/urbas/sbt-pless.png?branch=master)](https://travis-ci.org/urbas/sbt-pless)
+
+## Usage
+
+1.  Add the following lines to the `project/plugins.sbt` file:
+
+        resolvers += "Sonatype Public Repository" at "https://oss.sonatype.org/content/groups/public"
+
+        addSbtPlugin("si.urbas" % "sbt-pless" % "0.0.5")
+
+2.  Add this line at the top of `build.sbt`:
+
+    ```scala
+<%= snippet("build.sbt", "importProcessTransformation", "    ") %>
+    ```
+
+3.  Now you can transform your release process like this (this example uses the `sbtrelease` and the `pgpkeys` plugins):
+
+    ```scala
+<%= snippet("build.sbt", "releaseProcess", "    ") %>
+    ```

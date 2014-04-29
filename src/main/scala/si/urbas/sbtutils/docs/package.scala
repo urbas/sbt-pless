@@ -20,7 +20,7 @@ package object docs {
     docsOutputDir := target.value / DOCS_OUTPUT_DIR,
     includeFilter in docs := "*.ssp",
     docs <<= collectFiles(docsDirs, includeFilter in docs, excludeFilter in docs),
-    generateSspDocs := generateDocs(state.value.log, docsOutputDir.value, docsDirs.value, target.value / DOCS_SCRATCH_DIR, docs.value)
+    generateSspDocs := generateDocs(state.value.log, baseDirectory.value, docsOutputDir.value, docsDirs.value, target.value / DOCS_SCRATCH_DIR, docs.value, (sourceDirectories in Compile).value)
   )
 
   private val DOCS_SCRATCH_DIR = "docs-scratch"

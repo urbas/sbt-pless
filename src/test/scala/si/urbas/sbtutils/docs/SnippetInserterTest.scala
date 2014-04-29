@@ -72,7 +72,7 @@ class SnippetInserterTest extends WordSpec {
   private def withDirectorySetup(testBody: (SnippetInserter) => Unit): Unit = {
     withTemporaryDirectory {
       tmpDirectory =>
-        testBody(new SnippetInserter(tmpDirectory, new File(tmpDirectory, "templateFile")))
+        testBody(new SnippetInserter(Seq(tmpDirectory, new File(tmpDirectory, "templateFile"))))
     }
   }
 }

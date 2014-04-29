@@ -5,26 +5,30 @@ import java.util.regex.Pattern
 import si.urbas.sbtutils.docs.SnippetInserter._
 import java.io.FileNotFoundException
 
-class SnippetInserter(projectBaseDir: File, templateFile: File) {
+class SnippetInserter(snippetSearchPaths: Iterable[File]) {
 
-  def snippet(sourceFile: String, snippetName: String, linePrefix: String = ""): String = {
+  def snippet(sourceFile: String, snippetName: String, lineTransformer: String => String = identity): String = {
     val snippetFile = findSnippetFile(sourceFile)
     if (snippetFile.isFile) {
       val snippetLines = linesWithinSnippet(IO.readLines(snippetFile), snippetName)
-      concatenateSnippetLines(snippetLines, linePrefix)
+      concatenateSnippetLines(snippetLines, lineTransformer)
     } else {
-      throw new FileNotFoundException(insertionErrorMessage(snippetName, sourceFile) + s" Could not find the file.")
+      throw new FileNotFoundException(insertionErrorMessage(snippetName, sourceFile) + s" Could not find the file in the search paths: ${snippetSearchPaths.mkString(", ")}.")
     }
   }
 
 
-  private def concatenateSnippetLines(snippetLines: Iterable[String], linePrefix: String): String = {
+  def prefixLine(prefix: String)(line: String): String = {
+    s"$prefix$line"
+  }
+
+  private def concatenateSnippetLines(snippetLines: Iterable[String], lineTransformer: String => String): String = {
     val strBuilder = new StringBuilder()
     for (line <- snippetLines) {
       if (!strBuilder.isEmpty) {
         strBuilder.append(LINE_SEPARATOR)
       }
-      strBuilder.append(linePrefix).append(line)
+      strBuilder.append(lineTransformer(line))
     }
     strBuilder.toString()
   }
@@ -34,10 +38,10 @@ class SnippetInserter(projectBaseDir: File, templateFile: File) {
   }
 
   private def findSnippetFile(sourceFile: String): File = {
-    List(projectBaseDir.getCanonicalFile, templateFile.getParentFile.getCanonicalFile)
-      .map(_.relativize(file(sourceFile))).collectFirst {
-      case Some(file) => file
-    }.getOrElse(file(sourceFile))
+    snippetSearchPaths.toIterator
+      .map(_ / sourceFile)
+      .find(_.isFile)
+      .getOrElse(file(sourceFile))
   }
 
 }

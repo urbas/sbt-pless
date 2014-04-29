@@ -8,11 +8,12 @@ private[docs] object DocsGenerator {
   private val SNIPPET_INSERTER_BINDING_NAME = "snippetInserter"
 
   def generateDocs(log: Logger,
+                   projectBaseDir: File,
                    outputDirectory: File,
                    docsDirectories: Seq[File],
                    scratchDirectory: File,
-                   docFiles: Seq[File]): Seq[File] = {
-    log.info(s"Processing documentation...")
+                   docFiles: Seq[File],
+                   snippetSearchPaths: Seq[File]): Seq[File] = {
     outputDirectory.mkdirs()
     val canonicalBaseDirs = docsDirectories.map(_.getCanonicalFile).toList
     val templateEngine = createTemplateEngine(canonicalBaseDirs, scratchDirectory)
@@ -21,8 +22,8 @@ private[docs] object DocsGenerator {
       docFile =>
         val relativeDocFile = findRelativePath(canonicalBaseDirs, docFile)
         val outputFile = file(toResolvedPathWithoutExtension(outputDirectory, relativeDocFile))
-        log.info(s"Generating doc: $relativeDocFile -> ${outputDirectory.relativize(outputFile).get}")
-        val generatedDocContent = templateEngine.layout(relativeDocFile, createTemplateBindings(docFile))
+        log.info(s"Generating doc: ${docFile.getCanonicalPath} -> ${outputFile.getCanonicalPath}")
+        val generatedDocContent = templateEngine.layout(relativeDocFile, createTemplateBindings(docFile, projectBaseDir +: snippetSearchPaths))
         IO.write(outputFile, generatedDocContent)
         outputFile
     }
@@ -46,8 +47,8 @@ private[docs] object DocsGenerator {
     }.getOrElse(docFile).toString
   }
 
-  private def createTemplateBindings(docFile: File): Map[String, Any] = {
-    Map(SNIPPET_INSERTER_BINDING_NAME -> new SnippetInserter(file("."), docFile))
+  private def createTemplateBindings(docFile: File, snippetSearchPaths: Seq[File]): Map[String, Any] = {
+    Map(SNIPPET_INSERTER_BINDING_NAME -> new SnippetInserter(snippetSearchPaths :+ docFile.getParentFile))
   }
 
   private def toResolvedPathWithoutExtension(outputDirectory: File, relativeDocFile: String): String = {

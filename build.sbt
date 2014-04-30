@@ -3,13 +3,12 @@ import de.johoop.jacoco4sbt.JacocoPlugin._
 import sbtrelease.ReleasePlugin._
 import sbtrelease.ReleasePlugin.ReleaseKeys.releaseProcess
 import sbtrelease.ReleaseStateTransformations._
-import si.urbas.sbtutils.docs
-import si.urbas.sbtutils.docs.{generateSspDocs, sspDocsDir}
-import si.urbas.sbtutils.vcs.addFileToVcsImpl
+import si.urbas.sbtutils.docs._
 
 // SNIPPET: importProcessTransformation
 import si.urbas.sbtutils.releases.ReleaseProcessTransformation
 // ENDSNIPPET: importProcessTransformation
+
 import si.urbas.sbtutils.textfiles._
 import si.urbas.sbtutils.textfiles.TextFileManipulation._
 import xerial.sbt.Sonatype
@@ -83,7 +82,7 @@ releaseSettings
 // SNIPPET: generatingDocs
 si.urbas.sbtutils.docs.tasks
 
-docs.docsOutputDir := file(".")
+docsOutputDir := file(".")
 // ENDSNIPPET: generatingDocs
 
 si.urbas.sbtutils.textfiles.tasks
@@ -92,11 +91,7 @@ readmeMdFile := sspDocsDir.value / "README.md.ssp"
 
 lazy val bumpVersionInPluginsSbtFile = taskKey[Unit]("Replaces any references to the version of this project in 'project/plugins.sbt'.")
 
-lazy val generateAndStageDocs = taskKey[Unit]("Generates documentation files and stages them in the VCS.")
-
 bumpVersionInPluginsSbtFile := bumpVersionInFile(file("project/plugins.sbt"), organization.value, name.value, version.value)
-
-generateAndStageDocs := generateSspDocs.value.foreach(addFileToVcsImpl(state.value, _))
 
 // SNIPPET: releaseProcess
 releaseProcess := ReleaseProcessTransformation

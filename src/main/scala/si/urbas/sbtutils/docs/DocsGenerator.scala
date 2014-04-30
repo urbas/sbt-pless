@@ -7,13 +7,13 @@ private[docs] object DocsGenerator {
 
   private val SNIPPET_INSERTER_BINDING_NAME = "snippetInserter"
 
-  def generateDocs(log: Logger,
-                   projectBaseDir: File,
-                   outputDirectory: File,
-                   docsDirectories: Seq[File],
-                   scratchDirectory: File,
-                   docFiles: Seq[File],
-                   snippetSearchPaths: Seq[File]): Seq[File] = {
+  def generateDocsImpl(log: Logger,
+                       projectBaseDir: File,
+                       outputDirectory: File,
+                       docsDirectories: Seq[File],
+                       scratchDirectory: File,
+                       docFiles: Seq[File],
+                       snippetSearchPaths: Seq[File]): Seq[File] = {
     outputDirectory.mkdirs()
     val canonicalBaseDirs = docsDirectories.map(_.getCanonicalFile).toList
     val templateEngine = createTemplateEngine(canonicalBaseDirs, scratchDirectory)

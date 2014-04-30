@@ -36,12 +36,12 @@ Add the following to your `build.sbt` file:
 ```scala
 si.urbas.sbtutils.docs.tasks
 
-docs.docsOutputDir := file(".")
+docsOutputDir := file(".")
 ```
 
 Now create the file `src/main/docs/README.md.ssp` and run the following SBT task:
 
-    generateSspDocs
+    generateDocs
 
 This will generate the `README.md` file in the project's base directory.
 

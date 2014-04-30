@@ -17,10 +17,9 @@ class SnippetInserter(snippetSearchPaths: Iterable[File]) {
     }
   }
 
+  def prefixLine(prefix: String)(line: String): String = s"$prefix$line"
 
-  def prefixLine(prefix: String)(line: String): String = {
-    s"$prefix$line"
-  }
+  def trimPrefixLine(prefix: String)(line: String): String = prefixLine(prefix)(line.trim)
 
   private def concatenateSnippetLines(snippetLines: Iterable[String], lineTransformer: String => String): String = {
     val strBuilder = new StringBuilder()

@@ -47,6 +47,10 @@ class SnippetInserter(snippetSearchPaths: Iterable[File]) {
 
 object SnippetInserter {
   private val LINE_SEPARATOR = "\n"
+  private val SNIPPET_START_PREFIX_PATTERN = "^.*?SNIPPET:\\s*?"
+  private val SNIPPET_END_PREFIX_PATTERN = "^.*?ENDSNIPPET:\\s*?"
+  private val snippetEndPrefixRegex = Pattern.compile(SNIPPET_END_PREFIX_PATTERN + ".*$")
+  private val snippetStartPrefixRegex = Pattern.compile(SNIPPET_START_PREFIX_PATTERN + ".*$")
 
   def linesWithinSnippet(lines: Iterable[String], snippetName: String): Iterable[String] = {
     val snippetStartPattern = createSnippetStartPattern(snippetName)
@@ -59,16 +63,25 @@ object SnippetInserter {
           false
         } else {
           insideSnippet = !snippetEndPattern.matcher(line).matches()
-          insideSnippet
+          if (lineIsSnippetStartOrEndTag(line)) {
+            false
+          } else {
+            insideSnippet
+          }
         }
     }
   }
 
   private def createSnippetStartPattern(snippetName: String): Pattern = {
-    Pattern.compile("^.*?SNIPPET:\\s*?" + Pattern.quote(snippetName) + "$")
+    Pattern.compile(SNIPPET_START_PREFIX_PATTERN + Pattern.quote(snippetName) + "$")
   }
 
+
   private def createSnippetEndPattern(snippetName: String): Pattern = {
-    Pattern.compile("^.*?ENDSNIPPET:\\s*?" + Pattern.quote(snippetName) + "$")
+    Pattern.compile(SNIPPET_END_PREFIX_PATTERN + Pattern.quote(snippetName) + "$")
+  }
+
+  private def lineIsSnippetStartOrEndTag(s: String): Boolean = {
+    snippetEndPrefixRegex.matcher(s).matches() || snippetStartPrefixRegex.matcher(s).matches()
   }
 }

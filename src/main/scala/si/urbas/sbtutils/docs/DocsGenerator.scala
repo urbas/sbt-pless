@@ -2,56 +2,55 @@ package si.urbas.sbtutils.docs
 
 import sbt._
 import org.fusesource.scalate.{Binding, TemplateEngine}
+import sbt.IO.utf8
+import java.io.PrintWriter
 
 private[docs] object DocsGenerator {
 
   private val SNIPPET_INSERTER_BINDING_NAME = "snippetInserter"
 
-  def generateDocsImpl(log: Logger,
+  def generateDocsImpl(logger: Logger,
                        projectBaseDir: File,
                        outputDirectory: File,
                        docsDirectories: Seq[File],
                        scratchDirectory: File,
-                       docFiles: Seq[File],
+                       docFileFilter: FileFilter,
                        snippetSearchPaths: Seq[File]): Seq[File] = {
     outputDirectory.mkdirs()
-    val canonicalBaseDirs = docsDirectories.map(_.getCanonicalFile).toList
-    val templateEngine = createTemplateEngine(canonicalBaseDirs, scratchDirectory)
+
+    val templateEngine = createTemplateEngine(docsDirectories, scratchDirectory)
+    val docFiles = docsDirectories.flatMap(docsDir => PathFinder(docsDirectories).**(docFileFilter).get.map(_.relativeTo(docsDir).get))
 
     docFiles.map {
       docFile =>
-        val relativeDocFile = findRelativePath(canonicalBaseDirs, docFile)
-        val outputFile = file(toResolvedPathWithoutExtension(outputDirectory, relativeDocFile))
-        log.info(s"Generating doc: ${docFile.getCanonicalPath} -> ${outputFile.getCanonicalPath}")
-        val generatedDocContent = templateEngine.layout(relativeDocFile, createTemplateBindings(docFile, projectBaseDir +: snippetSearchPaths))
-        IO.write(outputFile, generatedDocContent)
+        val outputFile = file(toOutputPathWithoutExtension(outputDirectory, docFile.getPath))
+        logger.info(s"Generating doc: ${docFile.getCanonicalPath} -> ${outputFile.getCanonicalPath}")
+        IO.writer(outputFile, "", utf8) {
+          writer =>
+            templateEngine.layout(docFile.getPath, new PrintWriter(writer), createTemplateBindings(docFile, projectBaseDir +: snippetSearchPaths))
+        }
         outputFile
     }
   }
 
-  private def createTemplateEngine(canonicalBaseDirs: List[File], scratchDirectory: File): TemplateEngine = {
-    val templateEngine = new TemplateEngine(canonicalBaseDirs)
-    templateEngine.escapeMarkup = false
-    templateEngine.workingDirectory = scratchDirectory
-    templateEngine.bindings = createTemplateBindingSpecs
-    templateEngine
+  private def createTemplateEngine(templateSourceDirs: Seq[File], scratchDirectory: File): TemplateEngine = {
+    val canonicalSourceDirs = templateSourceDirs.map(_.getCanonicalFile).toList
+    new TemplateEngine(canonicalSourceDirs) {
+      escapeMarkup = false
+      workingDirectory = scratchDirectory
+      bindings = createTemplateBindingSpecs
+    }
   }
 
   private def createTemplateBindingSpecs: List[Binding] = {
     List(Binding(SNIPPET_INSERTER_BINDING_NAME, classOf[SnippetInserter].getCanonicalName, importMembers = true))
   }
 
-  private def findRelativePath(canonicalBaseDirs: List[File], docFile: File): String = {
-    canonicalBaseDirs.view.map(base => base.relativize(docFile)).collectFirst {
-      case Some(file) => file
-    }.getOrElse(docFile).toString
-  }
-
   private def createTemplateBindings(docFile: File, snippetSearchPaths: Seq[File]): Map[String, Any] = {
     Map(SNIPPET_INSERTER_BINDING_NAME -> new SnippetInserter(snippetSearchPaths :+ docFile.getParentFile))
   }
 
-  private def toResolvedPathWithoutExtension(outputDirectory: File, relativeDocFile: String): String = {
+  private def toOutputPathWithoutExtension(outputDirectory: File, relativeDocFile: String): String = {
     (outputDirectory / relativeDocFile).toString.replaceFirst("\\.[^.]+$", "")
   }
 

@@ -10,6 +10,7 @@ package object docs {
 
   lazy val sspDocsDir = settingKey[File]("Default SSP docs directory.")
   lazy val docsOutputDir = settingKey[File]("the directory into which output docs will be placed.")
+  lazy val docTemplateBindings = settingKey[Seq[TemplateBindingProvider]]("these provide Scala objects that will be inserted into documentation templates.")
   lazy val docsDirs = settingKey[Seq[File]]("a list of SSP directories under which SSP files should be looked up.")
   lazy val docsSnippetDirs = settingKey[Seq[File]]("a list of directories where to look for snippet files.")
   lazy val generateDocs = taskKey[Seq[File]]("Generates documentation by processing templates and outputting the result into the configured output directory.")
@@ -18,10 +19,11 @@ package object docs {
   lazy val tasks = Seq[Def.Setting[_]](
     sspDocsDir := sourceDirectory.value / "main" / DOCS_SOURCES_DIR,
     docsDirs := Seq(sspDocsDir.value),
+    docTemplateBindings := List(SnippetInserterTemplateBinding(baseDirectory.value +: docsSnippetDirs.value)),
     docsOutputDir := target.value / DOCS_OUTPUT_DIR,
     includeFilter in generateDocs := "*.ssp",
     docsSnippetDirs := (sourceDirectories in Compile).value ++ docsDirs.value ++ (sourceDirectories in Test).value,
-    generateDocs := generateDocsImpl(streams.value.log, baseDirectory.value, docsOutputDir.value, docsDirs.value, target.value / DOCS_SCRATCH_DIR, (includeFilter in generateDocs).value -- (excludeFilter in generateDocs).value, docsSnippetDirs.value),
+    generateDocs := generateDocsImpl(streams.value.log, baseDirectory.value, docsOutputDir.value, docsDirs.value, target.value / DOCS_SCRATCH_DIR, (includeFilter in generateDocs).value -- (excludeFilter in generateDocs).value, docsSnippetDirs.value, docTemplateBindings.value),
     generateAndStageDocs := generateDocs.value.foreach(addFileToVcsImpl(state.value, _))
   )
 

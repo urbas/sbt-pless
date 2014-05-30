@@ -67,13 +67,11 @@ pomExtra := {
 
 sources in doc in Compile := Nil
 
-publishArtifact in(Compile, packageDoc) := true
+publishArtifact in(Compile, packageDoc) := false
 
 publishArtifact in(Compile, packageSrc) := true
 
-publishArtifact in(Test, packageBin) := true
-
-publishArtifact in(Test, packageSrc) := true
+publishArtifact in(Test, packageSrc) := false
 
 jacoco.settings
 

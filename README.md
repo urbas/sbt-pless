@@ -9,7 +9,7 @@ Add the following lines to the `project/plugins.sbt` file:
 ```scala
 resolvers += "Sonatype Public Repository" at "https://oss.sonatype.org/content/groups/public"
 
-addSbtPlugin("si.urbas" % "sbt-pless" % "0.0.8")
+addSbtPlugin("si.urbas" % "sbt-pless" % "0.0.9")
 ```
 
 ### Release process transformations

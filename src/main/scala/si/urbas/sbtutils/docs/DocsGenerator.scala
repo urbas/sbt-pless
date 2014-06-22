@@ -1,23 +1,26 @@
 package si.urbas.sbtutils.docs
 
-import sbt._
-import org.fusesource.scalate.{Binding, TemplateEngine}
-import sbt.IO.utf8
 import java.io.PrintWriter
+
+import org.fusesource.scalate.TemplateEngine
+import sbt.IO.utf8
+import sbt.Keys._
+import sbt._
 
 object DocsGenerator {
 
-  def generateDocsImpl(logger: Logger,
-                       projectBaseDir: File,
-                       outputDirectory: File,
-                       docsDirectories: Seq[File],
-                       scratchDirectory: File,
-                       docFileFilter: FileFilter,
-                       snippetSearchPaths: Seq[File],
-                       templateBindingProviders: Seq[TemplateBindingProvider]): Seq[File] = {
+  def generateDocsTaskImpl: Def.Initialize[Task[Seq[File]]] = Def.task {
+    val logger = streams.value.log
+    val outputDirectory = docsOutputDir.value
+    val docsDirectories = docsDirs.value
+    val scratchDirectory = target.value / DOCS_SCRATCH_DIR
+    val docFileFilter = (includeFilter in generateDocs).value -- (excludeFilter in generateDocs).value
+    val snippetSearchPaths = docsSnippetDirs.value
+    val templateBindingProviders = docTemplateBindings.value
+
     outputDirectory.mkdirs()
 
-    val templateEngine = createTemplateEngine(docsDirectories, scratchDirectory, templateBindingProviders)
+    val templateEngine = createTemplateEngine(docsDirectories, scratchDirectory, templateBindingProviders, docsCompilerClasspath.value, docsClassLoader.value)
     val docFiles = docsDirectories.flatMap(docsDir => PathFinder(docsDirectories).**(docFileFilter).get.map(_.relativeTo(docsDir).get))
 
     docFiles.map {
@@ -34,12 +37,20 @@ object DocsGenerator {
 
   private def createTemplateEngine(templateSourceDirs: Seq[File],
                                    scratchDirectory: File,
-                                   templateBindingProviders: Seq[TemplateBindingProvider]): TemplateEngine = {
+                                   templateBindingProviders: Seq[TemplateBindingProvider],
+                                   extraClasspath: String,
+                                   customClassLoader: Option[ClassLoader]): TemplateEngine = {
     val canonicalSourceDirs = templateSourceDirs.map(_.getCanonicalFile).toList
     new TemplateEngine(canonicalSourceDirs) {
       escapeMarkup = false
       workingDirectory = scratchDirectory
       bindings = templateBindingProviders.map(_.bindingInfo).toList
+      combinedClassPath = true
+      classpath = extraClasspath
+      customClassLoader.foreach{
+        _classLoader =>
+          classLoader = _classLoader
+      }
     }
   }
 

@@ -35,14 +35,17 @@ Add the following to your `build.sbt` file:
 
 ```scala
 si.urbas.sbtutils.docs.tasks
-
-docsOutputDir := file(".")
 ```
 
 Now create the file `src/main/docs/README.md.ssp` and run the following SBT task:
 
-    generateDocs
+generateDocs
 
-This will generate the `README.md` file in the project's base directory.
+This will generate the `README.md` file in the project's base directory. If you want the documentation to be output
+elsewhere, add the following to your `build.sbt` file and change `baseDirectory.value` with your desired setting:
+
+```scala
+docsOutputDir := baseDirectory.value
+```
 
 See [Scalate's SSP documentation](http://scalate.fusesource.org/documentation/ssp-reference.html) for more information on how to write SSP docs.

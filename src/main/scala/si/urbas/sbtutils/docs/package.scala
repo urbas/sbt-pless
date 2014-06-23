@@ -6,6 +6,10 @@ import si.urbas.sbtutils.vcs._
 
 package object docs {
 
+  val DOCS_SCRATCH_DIR = "docs-scratch"
+  val DOCS_SOURCES_DIR = "docs"
+  val DOCS_OUTPUT_DIR = "docs"
+
   lazy val sspDocsDir = settingKey[File]("Default SSP docs directory.")
   lazy val docsOutputDir = settingKey[File]("the directory into which output docs will be placed.")
   lazy val docTemplateBindings = settingKey[Seq[TemplateBindingProvider]]("these provide Scala objects that will be inserted into documentation templates.")
@@ -27,15 +31,11 @@ package object docs {
     sspDocsDir := sourceDirectory.value / "main" / DOCS_SOURCES_DIR,
     docsDirs := Seq(sspDocsDir.value),
     docTemplateBindings := List(SnippetInserterTemplateBinding(baseDirectory.value +: docsSnippetDirs.value)),
-    docsOutputDir := target.value / DOCS_OUTPUT_DIR,
+    docsOutputDir := baseDirectory.value,
     includeFilter in generateDocs := "*.ssp",
     docsSnippetDirs := (sourceDirectories in Compile).value ++ docsDirs.value ++ (sourceDirectories in Test).value,
     generateDocs <<= DocsGenerator.generateDocsTaskImpl,
     generateAndStageDocs := generateDocs.value.foreach(addFileToVcsImpl(state.value, _))
   )
-
-  val DOCS_SCRATCH_DIR = "docs-scratch"
-  val DOCS_SOURCES_DIR = "docs"
-  val DOCS_OUTPUT_DIR = "docs"
 
 }

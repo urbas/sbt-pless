@@ -17,13 +17,13 @@ addSbtPlugin("si.urbas" % "sbt-pless" % "0.0.9")
 Add this line at the top of `build.sbt`:
 
 ```scala
-<%= snippet("build.sbt", "importProcessTransformation") %>
+<%= snippet("project/SbtPlessBuild.scala", "importProcessTransformation") %>
 ```
 
 Now you can transform your release process like this (this example uses the `sbtrelease` and the `pgpkeys` plugins):
 
 ```scala
-<%= snippet("build.sbt", "releaseProcess") %>
+<%= snippet("project/SbtPlessBuild.scala", "releaseProcess", _.stripPrefix("    ")) %>
 ```
 
 ### Documentation generation
@@ -31,13 +31,18 @@ Now you can transform your release process like this (this example uses the `sbt
 Add the following to your `build.sbt` file:
 
 ```scala
-<%= snippet("build.sbt", "generatingDocs") %>
+<%= snippet("project/SbtPlessBuild.scala", "generatingDocs", _.stripPrefix("        ")) %>
 ```
 
 Now create the file `src/main/docs/README.md.ssp` and run the following SBT task:
 
-<%= snippet("si/urbas/sbtutils/docs/docsTest.scala", "generateDocs", trimPrefixLine("    ")) %>
+<%= snippet("si/urbas/sbtutils/docs/docsTest.scala", "generateDocs", _.trim) %>
 
-This will generate the `README.md` file in the project's base directory.
+This will generate the `README.md` file in the project's base directory. If you want the documentation to be output
+elsewhere, add the following to your `build.sbt` file and change `baseDirectory.value` with your desired setting:
+
+```scala
+<%= snippet("project/SbtPlessBuild.scala", "docsOutputDir", _.trim) %>
+```
 
 See [Scalate's SSP documentation](http://scalate.fusesource.org/documentation/ssp-reference.html) for more information on how to write SSP docs.

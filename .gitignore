@@ -1,7 +1,12 @@
+# IntelliJ
 /.idea/libraries/
 /.idea/modules/
 /.idea/workspace.xml
 /.idea/uiDesigner.xml
+/.idea_modules/
+**/*.iml
+
+# SBT
 /target/
 /project/target/
 /project/project/

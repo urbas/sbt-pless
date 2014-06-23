@@ -23,7 +23,7 @@ Add this line at the top of `build.sbt`:
 Now you can transform your release process like this (this example uses the `sbtrelease` and the `pgpkeys` plugins):
 
 ```scala
-<%= snippet("project/SbtPlessBuild.scala", "releaseProcess", _.stripPrefix("    ")) %>
+<%= snippet("project/SbtPlessBuild.scala", "releaseProcess", snippetTransformer = stripIndentation) %>
 ```
 
 ### Documentation generation
@@ -31,7 +31,7 @@ Now you can transform your release process like this (this example uses the `sbt
 Add the following to your `build.sbt` file:
 
 ```scala
-<%= snippet("project/SbtPlessBuild.scala", "generatingDocs", _.stripPrefix("        ")) %>
+<%= snippet("project/SbtPlessBuild.scala", "generatingDocs", snippetTransformer = stripIndentation) %>
 ```
 
 Now create the file `src/main/docs/README.md.ssp` and run the following SBT task:

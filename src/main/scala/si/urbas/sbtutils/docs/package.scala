@@ -12,7 +12,7 @@ package object docs {
 
   lazy val sspDocsDir = settingKey[File]("Default SSP docs directory.")
   lazy val docsOutputDir = settingKey[File]("the directory into which output docs will be placed.")
-  lazy val docTemplateBindings = settingKey[Seq[TemplateBindingProvider]]("these provide Scala objects that will be inserted into documentation templates.")
+  lazy val docTemplateBindings = settingKey[Seq[TemplateBinding]]("these provide Scala objects that will be inserted into documentation templates.")
   lazy val docsDirs = settingKey[Seq[File]]("a list of SSP directories under which SSP files should be looked up.")
   lazy val docsSnippetDirs = settingKey[Seq[File]]("a list of directories where to look for snippet files.")
   lazy val generateDocs = taskKey[Seq[File]]("Generates documentation by processing templates and outputting the result into the configured output directory.")

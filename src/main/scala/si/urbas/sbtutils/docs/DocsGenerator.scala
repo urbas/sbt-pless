@@ -37,7 +37,7 @@ object DocsGenerator {
 
   private def createTemplateEngine(templateSourceDirs: Seq[File],
                                    scratchDirectory: File,
-                                   templateBindingProviders: Seq[TemplateBindingProvider],
+                                   templateBindingProviders: Seq[TemplateBinding],
                                    extraClasspath: String,
                                    customClassLoader: Option[ClassLoader]): TemplateEngine = {
     val canonicalSourceDirs = templateSourceDirs.map(_.getCanonicalFile).toList
@@ -54,7 +54,7 @@ object DocsGenerator {
     }
   }
 
-  private def createBindingInstances(docFile: File, templateBindingProviders: Seq[TemplateBindingProvider]): Map[String, Any] = {
+  private def createBindingInstances(docFile: File, templateBindingProviders: Seq[TemplateBinding]): Map[String, Any] = {
     templateBindingProviders.map(provider => (provider.bindingInfo.name, provider.bindingInstance(docFile))).toMap
   }
 

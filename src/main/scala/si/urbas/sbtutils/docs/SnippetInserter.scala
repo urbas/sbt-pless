@@ -9,7 +9,11 @@ import si.urbas.sbtutils.docs.SnippetInserter._
 import scala.collection.mutable
 
 class SnippetInserter(snippetSearchPaths: Iterable[File]) {
-  def snippet(sourceFile: String, snippetName: String, lineTransformer: String => String = identity, snippetTransformer: String => String = identity): String = {
+
+  def snippet(sourceFile: String,
+              snippetName: String,
+              lineTransformer: String => String = identity,
+              snippetTransformer: String => String = identity): String = {
     val snippetFile = findSnippetFile(sourceFile)
     if (snippetFile.isFile) {
       val snippetLines = linesWithinSnippet(IO.readLines(snippetFile), snippetName)
@@ -18,7 +22,6 @@ class SnippetInserter(snippetSearchPaths: Iterable[File]) {
       throw new FileNotFoundException(insertionErrorMessage(snippetName, sourceFile) + s" Could not find the file in the search paths: ${snippetSearchPaths.mkString(", ")}.")
     }
   }
-
 
   def prefixLine(prefix: String)(line: String): String = {
     s"$prefix$line"
@@ -32,30 +35,6 @@ class SnippetInserter(snippetSearchPaths: Iterable[File]) {
     val indentation = smallestIndentation(lines)
     val prefixPattern = Pattern.compile(s"^$indentation", Pattern.MULTILINE)
     prefixPattern.matcher(lines).replaceAll("")
-  }
-
-  private def smallestIndentation(lines: String): String = {
-    val nonBlankLinesMatcher = Pattern.compile( """^(.*?)\S+?.*$""", Pattern.MULTILINE).matcher(lines)
-    val indentationsOfNonBlankLines = mutable.Buffer[String]()
-    while (nonBlankLinesMatcher.find()) {
-      indentationsOfNonBlankLines += nonBlankLinesMatcher.group(1)
-    }
-    if (indentationsOfNonBlankLines.isEmpty) "" else indentationsOfNonBlankLines.minBy(_.length)
-  }
-
-  private def concatenateSnippetLines(snippetLines: Iterable[String], lineTransformer: String => String): String = {
-    val strBuilder = new StringBuilder()
-    for (line <- snippetLines) {
-      if (strBuilder.nonEmpty) {
-        strBuilder.append(LINE_SEPARATOR)
-      }
-      strBuilder.append(lineTransformer(line))
-    }
-    strBuilder.toString()
-  }
-
-  private def insertionErrorMessage(snippetName: String, sourceFile: String): String = {
-    s"Could not insert the snippet '$snippetName' in file '$sourceFile'."
   }
 
   private def findSnippetFile(sourceFile: String): File = {
@@ -104,5 +83,29 @@ object SnippetInserter {
 
   private def lineIsSnippetStartOrEndTag(s: String): Boolean = {
     snippetEndPrefixRegex.matcher(s).matches() || snippetStartPrefixRegex.matcher(s).matches()
+  }
+
+  private def insertionErrorMessage(snippetName: String, sourceFile: String): String = {
+    s"Could not insert the snippet '$snippetName' in file '$sourceFile'."
+  }
+
+  private def concatenateSnippetLines(snippetLines: Iterable[String], lineTransformer: String => String): String = {
+    val strBuilder = new StringBuilder()
+    for (line <- snippetLines) {
+      if (strBuilder.nonEmpty) {
+        strBuilder.append(LINE_SEPARATOR)
+      }
+      strBuilder.append(lineTransformer(line))
+    }
+    strBuilder.toString()
+  }
+
+  private def smallestIndentation(lines: String): String = {
+    val nonBlankLinesMatcher = Pattern.compile( """^(.*?)\S+?.*$""", Pattern.MULTILINE).matcher(lines)
+    val indentationsOfNonBlankLines = mutable.Buffer[String]()
+    while (nonBlankLinesMatcher.find()) {
+      indentationsOfNonBlankLines += nonBlankLinesMatcher.group(1)
+    }
+    if (indentationsOfNonBlankLines.isEmpty) "" else indentationsOfNonBlankLines.minBy(_.length)
   }
 }

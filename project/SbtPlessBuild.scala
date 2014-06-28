@@ -78,9 +78,10 @@ object SbtPlessBuild extends Build {
               </developers>
           },
           sources in doc in Compile := Nil,
-          publishArtifact in(Compile, packageDoc) := false,
+          publishArtifact in(Compile, packageDoc) := true,
           publishArtifact in(Compile, packageSrc) := true,
           publishArtifact in(Test, packageSrc) := false,
+          publishArtifact in(Test, packageDoc) := false,
           releaseProcessSetup,
           readmeMdFile := sspDocsDir.value / "README.md.ssp",
           bumpVersionInPluginsSbtFile := bumpVersionInFile(file("project/plugins.sbt"), organization.value, name.value, version.value)

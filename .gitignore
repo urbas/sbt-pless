@@ -11,3 +11,6 @@
 /project/target/
 /project/project/
 .history
+
+# Log files
+*.log
